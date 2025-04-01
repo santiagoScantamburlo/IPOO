@@ -1,5 +1,7 @@
 <?php
 
+require_once "config.php";
+
 spl_autoload_register(function ($className) {
     // Project-specific namespace prefix
     $prefix = 'Ipoo\\';
