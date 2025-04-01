@@ -9,11 +9,8 @@ use Ipoo\BaseClass;
  * @property string $surname
  * @property string $documentType
  * @property int $documentNumber
- * @property array $parents
  */
 class Person extends BaseClass
 {
-    protected array $attributes = ["name", "surname", "documentType", "documentNumber", "parents"];
-
-    protected array $hidden = ["parents"];
+    protected array $attributes = ["name", "surname", "documentType", "documentNumber"];
 }

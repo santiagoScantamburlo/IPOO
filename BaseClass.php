@@ -9,7 +9,7 @@ namespace Ipoo;
  * @method string toString(bool $includeHidden = false,int $depth = 0)
  * @method array<string, mixed> toArray(bool $includeHidden = false)
  */
-abstract class BaseClass
+class BaseClass
 {
     /**
      * ACCESSORS are not mandatory as the get(), __get() and __toString() methods will be able to find the variables as long as they are not declared as hidden
@@ -42,6 +42,13 @@ abstract class BaseClass
     protected array $hidden = [];
 
     /**
+     * Unique attribute of the class that will be used to identify the object and make comparisons between them
+     * 
+     * @var string[]
+     */
+    protected array $unique = [];
+
+    /**
      * CREATION METHODS:
      * - Constructor: __construct(array $_data = [])
      * - Static method: create(array $data)
@@ -65,7 +72,7 @@ abstract class BaseClass
      * 
      * @return static
      */
-    public static function create(array $data)
+    public static function create(array $data = [])
     {
         return new static($data);
     }
@@ -125,6 +132,12 @@ abstract class BaseClass
         if (gettype($attribute) === "string") {
             if ($this->isHidden($attribute)) return null;
 
+            $getter = 'get' . ucfirst($attribute) . 'Attribute';
+
+            if (method_exists($this, $getter)) {
+                return $this->$getter();
+            }
+
             return $this->$attribute;
         }
 
@@ -132,6 +145,13 @@ abstract class BaseClass
             $return = [];
             foreach ($attribute as $attributeName) {
                 if ($this->isHidden($attributeName)) continue;
+
+                $getter = 'get' . ucfirst($attributeName) . 'Attribute';
+
+                if (method_exists($this, $getter)) {
+                    $return[$attributeName] = $this->$getter();
+                    continue;
+                }
 
                 $return[$attributeName] = $this->$attributeName;
             }
@@ -193,11 +213,11 @@ abstract class BaseClass
             // transform the attribute name: camelCaseAttribute => Camel Case Attribute
             $words = preg_replace('/(?<!\ )[A-Z]/', ' $0', $attributeName);
             $words = ucwords($words);
-            $tabs = str_repeat("\t", $depth); // add tabs to the string to make it more readable
+            $tabs = str_repeat("  ", $depth); // add tabs to the string to make it more readable
             $words = $tabs . $words;
 
             // check if the getter function exists
-            $getter = 'get' . ucfirst($attributeName);
+            $getter = 'get' . ucfirst($attributeName) . 'Attribute';
 
             if (method_exists($this, $getter)) {
                 $result[] = "$words: " . $this->$getter();
@@ -208,7 +228,7 @@ abstract class BaseClass
             if ($includeHidden || !$this->isHidden($attributeName)) {
                 // if the property is a BaseClass instance, call the __toString() method of the BaseClass class
                 if ($this->$attributeName instanceof BaseClass) {
-                    $result[] = "$words: " . $this->$attributeName->toString();
+                    $result[] = "$words:\n" . $this->$attributeName->toString($includeHidden, $depth + 1);
                     continue;
                 }
 
@@ -218,7 +238,7 @@ abstract class BaseClass
                     foreach ($this->$attributeName as $key => $value) {
                         // if it is an array of BaseClass instances, call the toString() method of the BaseClass increasing the depth
                         if ($value instanceof BaseClass) {
-                            $result[] = $value->toString($depth + 1);
+                            $result[] = $value->toString($includeHidden, $depth + 1);
                             continue;
                         }
 
@@ -260,7 +280,7 @@ abstract class BaseClass
             // check if the property exists
             if ($includeHidden || !$this->isHidden($attributeName)) {
                 if ($this->$attributeName instanceof BaseClass) {
-                    $result[$attributeName] = $this->$attributeName->toArray();
+                    $result[$attributeName] = $this->$attributeName->toArray($includeHidden);
                 } else {
                     $result[$attributeName] = $this->$attributeName;
                 }
@@ -285,5 +305,29 @@ abstract class BaseClass
     private function isHidden(string $property): bool
     {
         return in_array($property, $this->hidden);
+    }
+
+    /**
+     * Checks if the object is equal to another object. It will compare the unique attribute of the class.
+     * 
+     * @param static $object
+     * 
+     * @return bool
+     */
+    public function isEqualTo(BaseClass $object): bool
+    {
+        if (count($this->unique) !== count($object->unique)) return false;
+        if (count($this->unique) === 0) return false;
+        if (count($object->unique) === 0) return false;
+
+        foreach ($this->unique as $uniqueKey) {
+            if (!in_array($uniqueKey, $object->unique)) return false;
+        }
+
+        foreach ($this->unique as $uniqueKey) {
+            if ($object->$uniqueKey !== $this->$uniqueKey) return false;
+        }
+
+        return true;
     }
 }
