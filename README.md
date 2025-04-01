@@ -81,7 +81,7 @@ public function getPriceAttribute(): string
     return "$" . $this->price;
 }
 
-$book->getPrice(); // '$10'
+$book->getPriceAttribute(); // '$10'
 $book->get('price'); // '$10'
 $book->get(['price']); // ['price' => '$10']
 ```
