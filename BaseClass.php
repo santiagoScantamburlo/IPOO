@@ -248,7 +248,7 @@ abstract class BaseClass
      */
 
     /**
-     * Returns the attributes of the class as an array. This is useful for converting the object to an array.
+     * Returns the attributes of the class as an array.
      * This is a recursive function that will call the toArray() method of the BaseClass and of the child classes.
      * 
      * @return array<string, mixed>
