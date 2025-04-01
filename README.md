@@ -138,3 +138,24 @@ By default, `toArray()` won't return hidden attributes. To get those attributes 
 // Using toArray() method to get the class represented as an associative array with its hidden attributes
 $bookArray = $book->toArray(includeHidden: true); // ['isbn' => 1,'title' => 'Book Title', ...]
 ```
+
+### Comparing objects
+
+There is a way to compare objects by defining the keys that will be used for the comparisson as those should be the keys that differenciate the objects:
+
+```php
+protected array $unique = ['isbn'];
+
+$book2 = new Book([
+    'isbn' => 2,
+    'title' => 'Book Title',
+    'author' => 'Book Author',
+    'price' => 10
+]);
+
+$book->isEqualTo($book2); // false
+
+$book2->fill('isbn', 1);
+
+$book->isEqualTo($book2); // true
+```
