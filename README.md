@@ -12,7 +12,7 @@ namespace Ipoo\Your\Namespace;
 use Ipoo\BaseClass;
 
 class Book extends BaseClass {
-    protected array $attributes = ['isbn', 'title', 'author', 'price']:
+    protected array $attributes = ['isbn', 'title', 'author', 'price'];
 
     protected array $hidden = ['isbn'];
 }
