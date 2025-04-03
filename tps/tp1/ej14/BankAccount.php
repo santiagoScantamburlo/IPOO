@@ -2,7 +2,7 @@
 
 namespace Ipoo\Tps\Tp1\Ej14;
 
-use Ipoo\BaseClass;
+use Ipoo\Src\BaseClass;
 
 define('DAYS_IN_CURRENT_YEAR', (date('Y') % 4 == 0 && (date('Y') % 100 != 0 || date('Y') % 400 == 0)) ? 366 : 365);
 

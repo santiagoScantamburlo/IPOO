@@ -2,7 +2,7 @@
 
 namespace Ipoo\Tps\Tp1\Ej10;
 
-use Ipoo\BaseClass;
+use Ipoo\Src\BaseClass;
 
 class CustomDate extends BaseClass
 {

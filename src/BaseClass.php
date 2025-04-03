@@ -1,25 +1,86 @@
 <?php
 
-namespace Ipoo;
+namespace Ipoo\Src;
 
-/**
- * @method static static create(array $data)
- * @method string|array<string, mixed> get(string|array $attribute)
- * @method void fill(string|array $attribute, mixed $value = null)
- * @method string toString(bool $includeHidden = false,int $depth = 0)
- * @method array<string, mixed> toArray(bool $includeHidden = false)
- */
+use Ipoo\Src\Traits\ConditionQueryMethods;
+use Ipoo\Src\Traits\ReadQueryMethods;
+use Ipoo\Src\Traits\WriteQueryMethods;
+use PDO;
+use PDOException;
+
 class BaseClass
 {
-    /**
-     * ACCESSORS are not mandatory as the get(), __get() and __toString() methods will be able to find the variables as long as they are not declared as hidden
-     * In case you want to perform some kind of modification to the variable, you can use them to return the mutated value.
-     */
+    use WriteQueryMethods, ReadQueryMethods, ConditionQueryMethods;
 
     /**
-     * MUTATORS are not mandatory either as the __set() and fill() method will be able to find and set those variables
+     * Object to connect and query the database
+     * 
+     * @var PDO $pdo
      */
+    protected ?PDO $pdo = null;
 
+    /**
+     * Name of the table that is going to be queried
+     * 
+     * @var string $table
+     */
+    protected string $table = "";
+
+    /**
+     * Query string that is going to be executed
+     * 
+     * @var string $query
+     */
+    protected string $query = '';
+
+    /**
+     * Query string that is going to be added to filter in the DB
+     * 
+     * @var string $where
+     */
+    protected string $where = '';
+
+    /**
+     * Query string that is going to be added to limit the amount of results
+     * 
+     * @var string $limit
+     */
+    protected string $limit = '';
+
+    /**
+     * Query string that is going to be added to order the data
+     * 
+     * @var string $orderBy
+     */
+    protected string $orderBy = '';
+
+    /**
+     * Query string that is going to be added to group the data
+     * 
+     * @var string $groupBy
+     */
+    protected string $groupBy = '';
+
+    /**
+     * Flag that is going to begin transactions, commits and rollbacks
+     * 
+     * @var bool $withTransaction
+     */
+    protected bool $withTransaction = false;
+
+    /**
+     * Flag that is going to filter soft deleted records
+     * 
+     * @var bool $withDeleted
+     */
+    protected bool $withDeleted = false;
+
+    /**
+     * Array that will contain the bindings to the query executions once they are prepared
+     * 
+     * @var array|array<string, mixed> $bindings
+     */
+    protected array $bindings = [];
     /**
      * All class fields with their values
      * 
@@ -49,10 +110,21 @@ class BaseClass
     protected array $unique = [];
 
     /**
+     * ACCESSORS are not mandatory as the get(), __get() and __toString() methods will be able to find the variables as long as they are not declared as hidden
+     * In case you want to perform some kind of modification to the variable, you can use them to return the mutated value.
+     */
+
+    /**
+     * MUTATORS are not mandatory either as the __set() and fill() method will be able to find and set those variables
+     */
+
+    /**
      * CREATION METHODS:
      * - Constructor: __construct(array $_data = [])
      * - Static method: create(array $data)
      */
+
+    public const OPERATORS = ['=', '<>', 'like'];
 
     /**
      * Constructor method that will be used to set the values of the attributes. It will be called when the class is instantiated.
@@ -60,6 +132,29 @@ class BaseClass
      */
     public function __construct(array $_data = [])
     {
+        if ($this->table !== "") {
+            $dsn = 'mysql:host=' . DB_HOST;
+
+            if (defined('DB_PORT') && DB_PORT !== '3306') {
+                $dsn .= ';port=' . DB_PORT;
+            }
+
+            $dsn .= ';dbname=' . DB_NAME;
+
+            try {
+                $this->pdo = new PDO(
+                    $dsn,
+                    DB_USER,
+                    DB_PASS,
+                    [
+                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
+                    ]
+                );
+            } catch (PDOException $e) {
+                throw new PDOException('Database connection failed: ' . $e->getMessage());
+            }
+        }
         foreach ($this->attributes as $attribute) {
             $this->data[$attribute] = $_data[$attribute] ?? null;
         }
@@ -113,54 +208,7 @@ class BaseClass
         return $this->toString();
     }
 
-
-    /**
-     * ACCESSOR METHODS:
-     * - get(string|array $attribute): null|string|array<string, mixed>
-     */
-
-    /**
-     * Receive an attribute name or a list of attribute names and return them. In case it is only one, return it as a string, if it is an array return it as a list of attributes with their values.
-     * Returns an empty array if there were no attributes to get.
-     * 
-     * @param string|string[] $attribute
-     * 
-     * @return null|string|array<string, mixed>
-     */
-    public function get(string|array $attribute)
-    {
-        if (gettype($attribute) === "string") {
-            if ($this->isHidden($attribute)) return null;
-
-            $getter = 'get' . ucfirst($attribute) . 'Attribute';
-
-            if (method_exists($this, $getter)) {
-                return $this->$getter();
-            }
-
-            return $this->$attribute;
-        }
-
-        if (gettype($attribute) === "array") {
-            $return = [];
-            foreach ($attribute as $attributeName) {
-                if ($this->isHidden($attributeName)) continue;
-
-                $getter = 'get' . ucfirst($attributeName) . 'Attribute';
-
-                if (method_exists($this, $getter)) {
-                    $return[$attributeName] = $this->$getter();
-                    continue;
-                }
-
-                $return[$attributeName] = $this->$attributeName;
-            }
-
-            return $return;
-        }
-
-        return null;
-    }
+    public function __call($name, $args) {}
 
 
     /**
@@ -196,6 +244,13 @@ class BaseClass
         }
     }
 
+
+    /**
+     * TRANSFORM METHODS:
+     * - toString(bool $includeHidden = false, int $depth = 0): string
+     * - toArray(bool $includeHidden = false): array<string, mixed>
+     */
+
     /**
      * Returns the attributes of the class as a string. This is useful for debugging purposes.
      * This is a recursive function that will call the toString() method of the BaseClass and of the child classes.
@@ -210,15 +265,12 @@ class BaseClass
         $result = [];
 
         foreach ($this->data as $attributeName => $attributeValue) {
-            // transform the attribute name: camelCaseAttribute => Camel Case Attribute
-            $words = preg_replace('/(?<!\ )[A-Z]/', ' $0', $attributeName);
-            $words = ucwords($words);
             $tabs = str_repeat("  ", $depth); // add tabs to the string to make it more readable
-            $words = $tabs . $words;
+            $words = $tabs . $attributeName;
+
+            $getter = 'get' . str_replace('_', '', ucwords($attributeName, '_')) . 'Attribute';
 
             // check if the getter function exists
-            $getter = 'get' . ucfirst($attributeName) . 'Attribute';
-
             if (method_exists($this, $getter)) {
                 $result[] = "$words: " . $this->$getter();
                 continue;
@@ -262,12 +314,6 @@ class BaseClass
     }
 
     /**
-     * TRANSFORM METHODS:
-     * - toString(bool $includeHidden = false, int $depth = 0): string
-     * - toArray(bool $includeHidden = false): array<string, mixed>
-     */
-
-    /**
      * Returns the attributes of the class as an array.
      * This is a recursive function that will call the toArray() method of the BaseClass and of the child classes.
      * 
@@ -293,6 +339,7 @@ class BaseClass
     /**
      * UTILITY METHODS:
      * - isHidden(string $property): bool
+     * - isEqualTo(BaseClass $object): bool
      */
 
     /**
@@ -329,5 +376,115 @@ class BaseClass
         }
 
         return true;
+    }
+
+
+    /**
+     * Query methods
+     */
+
+    /**
+     * Executes the query and returns the results as instances of the class
+     * 
+     * @return array
+     */
+    public function get(): array
+    {
+        if ($this->query === "") {
+            $this->select();
+        }
+
+        if (method_exists($this, "softDelete") && !$this->withDeleted) {
+            $this->where .= 'deleted_at <> NULL';
+        }
+
+        $statement = $this->pdo->prepare($this->query . $this->where . $this->orderBy . $this->groupBy . $this->limit);
+
+        $statement->execute($this->bindings);
+
+        $results = $statement->fetchAll();
+
+        $this->reset(); // Reset all query strings
+
+        return array_map(function ($item) {
+            return $this->hydrate($item);
+        }, $results);
+    }
+
+    /**
+     * Sets the transaction flag to true
+     * 
+     * @return self
+     */
+    public function withTransaction(): self
+    {
+        $this->withTransaction = true;
+        return $this;
+    }
+
+    /**
+     * Sets all the variables to their default values
+     * 
+     * @return void
+     */
+    public function reset(): void
+    {
+        $this->query = '';
+        $this->where = '';
+        $this->limit = '';
+        $this->orderBy = '';
+        $this->groupBy = '';
+        $this->withTransaction = false;
+        $this->withDeleted = false;
+        $this->bindings = [];
+    }
+
+    /**
+     * Creates an instance of the class
+     * 
+     * @param object|array<string, mixed> $data
+     * 
+     * @return self
+     */
+    protected function hydrate(array|object $data): self
+    {
+        $class = get_called_class();
+        $instance = new $class();
+
+        foreach ($data as $key => $value) {
+            $instance->$key = $value;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Returns the query string that is being formed
+     * 
+     * @return string
+     */
+    public function toSql(): string
+    {
+        if (method_exists($this, "softDelete") && !$this->withDeleted) {
+            $this->where .= "deleted_at <> NULL";
+        }
+
+        return $this->query . $this->where . $this->orderBy . $this->groupBy . $this->limit;
+    }
+
+    /**
+     * Returns the query string that is being formed but instead of the placeholders, returs the values
+     * 
+     * @return string
+     */
+    public function queryWithBindings(): string
+    {
+        $query = $this->toSql();
+
+        foreach ($this->bindings as $bindingKey => $bindingValue) {
+            $query = str_replace($bindingKey, $bindingValue, $query);
+        }
+
+        return $query;
     }
 }

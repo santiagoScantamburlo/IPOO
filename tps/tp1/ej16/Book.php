@@ -2,7 +2,7 @@
 
 namespace Ipoo\Tps\Tp1\Ej16;
 
-use Ipoo\BaseClass;
+use Ipoo\Src\BaseClass;
 
 /**
  * @property string $isbn

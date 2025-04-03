@@ -2,7 +2,7 @@
 
 namespace Ipoo\Tps\Tp2\Ej1;
 
-use Ipoo\BaseClass;
+use Ipoo\Src\BaseClass;
 
 /**
  * @property string $name

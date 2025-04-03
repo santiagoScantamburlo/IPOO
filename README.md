@@ -9,7 +9,7 @@ namespace Ipoo;
 
 namespace Ipoo\Your\Namespace;
 
-use Ipoo\BaseClass;
+use Ipoo\Src\BaseClass;
 
 class Book extends BaseClass {
     protected array $attributes = ['isbn', 'title', 'author', 'price'];
@@ -35,17 +35,6 @@ $book = new Book([
     'author' => 'Book Author',
     'price' => 10
 ]);
-
-// create() method without arguments
-$book = Book::create();
-
-// create() method with properties
-$book = Book::create([
-    'isbn' => 1,
-    'title' => 'Book Title',
-    'author' => 'Book Author',
-    'price' => 10
-]);
 ```
 
 ## Accessing your class properties
@@ -55,16 +44,10 @@ There are multiple ways of getting the values of your class:
 ```php
 // Using __get() magic method
 $title = $book->title; // 'Book Title'
-
-// Using get() method for a single attribute
-$title = $book->get('title'); // 'Book Title'
-
-// Using get() method for multiple attributes
-$title = $book->get(['title']); // ['title' => 'Book Title']
 ```
 
 You can also make your custom accessors following the convention:</br>
-For the attribute `yourAttributeName`, its accessor should be called `getYourAttributeNameAttribute()`:
+For the attribute `your_attribute_name`, its accessor should be called `getYourAttributeNameAttribute()`:
 
 ```php
 public function getTitleAttribute(): string
