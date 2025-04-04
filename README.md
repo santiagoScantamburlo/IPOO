@@ -532,7 +532,7 @@ php src/Scripts/newClass.php -n Book --table=books
 or
 
 ```bash
-php src/Scripts/newClass.php -n Book --t books
+php src/Scripts/newClass.php -n Book -t books
 ```
 
 Output:
