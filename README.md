@@ -1,4 +1,40 @@
-# BaseClass usage
+[BaseClass basic usage](#baseclass-basic-usage)
+
+- [Extending](#extending)
+- [Creating instances of your class](#creating-instances-of-your-class)
+- [Accessing your class properties](#accessing-your-class-properties)
+- [Mutating your class properties](#mutating-your-class-properties)
+- [Getting your class transformed](#getting-your-class-transformed)
+  - [Getting string](#getting-string)
+  - [Getting array](#getting-array)
+- [Comparing objects](#comparing-objects)
+
+---
+
+[Usage with databases](#usage-with-databases)
+
+- [Database connection](#database-connection)
+- [Link classes to tables](#link-classes-to-tables)
+- [Basic query operations](#basic-query-operations)
+  - [get](#get)
+  - [select](#select)
+  - [where](#where)
+  - [find](#find--findorfail)
+  - [orderBy](#orderby)
+  - [groupBy](#groupby)
+  - [limit](#limit)
+  - [first](#first)
+  - [last](#last)
+  - [insert](#insert)
+  - [save](#save)
+  - [update](#update)
+- [Delete](#delete)
+  - [Soft deletes](#soft-deletes)
+- [Debugging](#debugging)
+
+---
+
+# BaseClass basic usage
 
 ## Extending
 
@@ -122,7 +158,7 @@ By default, `toArray()` won't return hidden attributes. To get those attributes 
 $bookArray = $book->toArray(includeHidden: true); // ['isbn' => 1,'title' => 'Book Title', ...]
 ```
 
-### Comparing objects
+## Comparing objects
 
 There is a way to compare objects by defining the keys that will be used for the comparisson as those should be the keys that differenciate the objects:
 
@@ -141,4 +177,261 @@ $book->isEqualTo($book2); // false
 $book2->fill('isbn', 1);
 
 $book->isEqualTo($book2); // true
+```
+
+# Usage with databases
+
+## Database connection
+
+The only configuration needed to connect to your database is a `.env` file that contains the credentials. You will find a `.env.example` file that has all the secret keys needed so you just have to rename it or make a copy.
+
+## Link classes to tables
+
+Your classes can be asigned to a table in your database to interact with its data. To get your PDO going, the only requirement is adding the `$table` variable to your class and extend `BaseClass`:
+
+```php
+class Book extends BaseClass {
+    protected string $table = 'books';
+}
+```
+
+Just with that, you can start querying your database.
+
+## Basic query operations
+
+The following examples will use a variable called `$bookObj` that is simply defined as:
+
+```php
+$bookObj = new Book();
+```
+
+### get
+
+The `get()` method will execute the generated query and return an array filled with instances of the class queried. If it is called alone, it will return all columns and all data without any filter.
+
+```php
+$books = $bookObj->get(); // SELECT * FROM books
+```
+
+> This method must always be called to execute the query that you are building.
+
+### select
+
+The `select()` method can receive one or more column names to get from the database:
+
+```php
+$books = $bookObj->select(); // SELECT * FROM books
+$books = $bookObj->select('isbn'); //SELECT isbn FROM books
+$books = $bookObj->select(['isbn', 'title']); // SELECT isbn, title FROM books
+```
+
+### where
+
+The `where()` method can receive the column to compare, the operator you want to use and the value to compare with:
+
+```php
+$books = $bookObj->where('isbn', '=', '1234'); // SELECT FROM books WHERE isbn = '1234'
+// or
+$books = $bookObj->where('isbn', '1234'); // SELECT FROM books WHERE isbn = '1234'
+```
+
+> If you don't use any operator, it will default to `"="`. Valid operators are `"="`, `"<>"`. `"like"`;
+
+You can also chain multiple where clauses:
+
+```php
+$books = $bookObj->where('isbn', '1234')->where('title', 'like', '%title%');
+// SELECT * FROM books WHERE isbn = '1234' AND title LIKE '%title%'
+```
+
+### find / findOrFail
+
+You can look for a specific id in the table using `find()`:
+
+```php
+$book = $bookObj->find(1); // SELECT FROM books WHERE id = 1
+```
+
+You can also use `findOrFail()` which will throw a `PDOException` if the record is not found:
+
+```php
+try {
+    $book = $bookObj->findOrFail(1);
+} catch(PDOException $e) {
+    echo 'ERROR: ' . $e->getMessage();
+}
+```
+
+### orderBy
+
+You can order the records using `orderBy()`:
+
+```php
+$bookObj->orderBy('isbn'); // SELECT * FROM books ORDER BY isbn ASC
+```
+
+You can specify the direction of the order (ASC or DESC). If no direction is passed, it defaults to ASC.
+
+```php
+$bookObj->orderBy('isbn', 'DESC')->orderBy('title'); // SELECT * FROM books ORDER BY isbn DESC, title ASC
+```
+
+### groupBy
+
+You can group the records using `groupBy`:
+
+```php
+$bookObj->groupBy('author'); // SELECT * FROM books GROUP BY author
+```
+
+### limit
+
+You can specify the maximum amount of records returned using `limit()`:
+
+```php
+$bookObj->limit(2); // SELECT * FROM books LIMIT 2
+```
+
+### first
+
+Get the first record found using `first()`:
+
+```php
+$bookObj->first();
+```
+
+### last
+
+Get the last record found using `last()`:
+
+```php
+$bookObj->last();
+```
+
+### insert
+
+You can also store one or more records at once using `insert()`:
+
+```php
+// one record
+$bookObj->insert([
+    'isbn' => '12345',
+    'title' => 'Book Title',
+    'author' => 'Brandon Sanderson',
+    'price' => 15
+]);
+
+// multiple records
+$bookObj->insert([
+    [
+        'isbn' => '12345',
+        'title' => 'Book Title',
+        'author' => 'Brandon Sanderson',
+        'price' => 15
+    ],
+    ...
+]);
+```
+
+### save
+
+Alternativelly, you can save your object after constructing it using `save()`:
+
+```php
+$newBookObj = new Book([
+    'isbn' => '12345',
+    'title' => 'Book Title',
+    'author' => 'Brandon Sanderson',
+    'price' => 15
+]);
+
+$newBookObj->save();
+```
+
+### update
+
+You can also update using `update()` method:
+
+```php
+$bookObj->update(['title' => 'New Title']); // NOTE: this will set all book titles in table to 'New Title'. Make sure to add a where clause
+
+$bookObj->where('id', 1)->update(['title' => 'New Title']);
+```
+
+Or update using `save()`
+
+```php
+$book = $bookObj->findOrFail(1);
+
+$book->title = "New Title";
+
+$book->save();
+```
+
+## Delete
+
+When deleting, the records would normally be erased from the database. However, there is also a way to handle soft deletion.
+
+To delete a record, you would normally do:
+
+```php
+$book = $bookObj->findOrFail(1);
+
+$book->delete();
+```
+
+### Soft Deletes
+
+If you want to soft delete a record, you must add the following to your class:
+
+```php
+use Ipoo\Src\Traits\SoftDeletes;
+
+class Book extends BaseClass {
+    use SoftDeletes;
+}
+```
+
+And also add a column named `deleted_at` that will store the time of deletion.
+
+In case you were wondering, when using soft deletes, you don't have to add extra conditions to filter deleted records. However, you can retrieve records deleted too:
+
+```php
+$bookObj->get(); // SELECT * FROM books WHERE deleted_at = NULL
+
+$bookObj->withDeleted()->get(); // SELECT * FROM books
+```
+
+If you want to restore a soft deleted record, just call the `restore()` method that will set the `deleted_at` to `NULL`:
+
+```php
+$book = $bookObj->withDeleted()->find(1);
+
+$book->restore();
+```
+
+## Debugging
+
+If you want to output your query before executing it, you can use `toSql()` or `toSqlWithBindings()`:
+
+`toSql()` will output the prepared query without the real values:
+
+```php
+$bookObj->select(['id', 'isbn'])
+    ->where('author', '<>', 'Brandon Sanderson')
+    ->orderBy('id')
+    ->limit(10)
+    ->toSql();
+// SELECT id, isbn FROM books WHERE author <> :author ORDER BY id LIMIT 10
+```
+
+`toSqlWithBindings()` will output the prepared query asigning the values:
+
+```php
+$bookObj->select(['id', 'isbn'])
+    ->where('author', '<>', 'Brandon Sanderson')
+    ->orderBy('id')
+    ->limit(10)
+    ->toSql();
+// SELECT id, isbn FROM books WHERE author <> 'Brandon Sanderson' ORDER BY id LIMIT 10
 ```

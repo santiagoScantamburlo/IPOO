@@ -108,6 +108,10 @@ trait WriteQueryMethods
      */
     public function save()
     {
+        if (!is_null($this->id)) {
+            return $this->where('id', $this->id)->update($this->toArray(includeHidden: true));
+        }
+
         return $this->insert($this->toArray(includeHidden: true));
     }
 }

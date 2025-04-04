@@ -395,7 +395,7 @@ class BaseClass
         }
 
         if (method_exists($this, "softDelete") && !$this->withDeleted) {
-            $this->where .= 'deleted_at <> NULL';
+            $this->where('deleted_at', 'NULL');
         }
 
         $statement = $this->pdo->prepare($this->query . $this->where . $this->orderBy . $this->groupBy . $this->limit);
@@ -466,7 +466,7 @@ class BaseClass
     public function toSql(): string
     {
         if (method_exists($this, "softDelete") && !$this->withDeleted) {
-            $this->where .= "deleted_at <> NULL";
+            $this->where('deleted_at', 'NULL');
         }
 
         return $this->query . $this->where . $this->orderBy . $this->groupBy . $this->limit;
@@ -477,7 +477,7 @@ class BaseClass
      * 
      * @return string
      */
-    public function queryWithBindings(): string
+    public function toSqlWithBindings(): string
     {
         $query = $this->toSql();
 
