@@ -446,6 +446,6 @@ $bookObj->select(['id', 'isbn'])
     ->where('author', '<>', 'Brandon Sanderson')
     ->orderBy('id')
     ->limit(10)
-    ->toSql();
+    ->toSqlWithBindings();
 // SELECT id, isbn FROM books WHERE author <> 'Brandon Sanderson' ORDER BY id LIMIT 10
 ```
