@@ -256,7 +256,7 @@ You can also use `findOrFail()` which will throw a `PDOException` if the record 
 
 ```php
 try {
-    $book = $bookObj->findOrFail(1);
+    $book = $bookObj->findOrFail(1); // SELECT FROM books WHERE id = 1
 } catch(PDOException $e) {
     echo 'ERROR: ' . $e->getMessage();
 }
@@ -297,7 +297,7 @@ $bookObj->limit(2); // SELECT * FROM books LIMIT 2
 Get the first record found using `first()`:
 
 ```php
-$bookObj->first();
+$bookObj->first(); // SELECT * FROM books LIMIT 1
 ```
 
 ### last
@@ -305,7 +305,7 @@ $bookObj->first();
 Get the last record found using `last()`:
 
 ```php
-$bookObj->last();
+$bookObj->last(); // SELECT * FROM books ORDER BY id DESC LIMIT 1
 ```
 
 ### insert
@@ -320,6 +320,7 @@ $bookObj->insert([
     'author' => 'Brandon Sanderson',
     'price' => 15
 ]);
+// INSERT INTO books (isbn, title, author, price) VALUES ('12345', 'Book Title', 'Brandon Sanderson', 15)
 
 // multiple records
 $bookObj->insert([
@@ -331,6 +332,7 @@ $bookObj->insert([
     ],
     ...
 ]);
+// INSERT INTO books (isbn, title, author, price) VALUES ('12345', 'Book Title', 'Brandon Sanderson', 15), (...)
 ```
 
 ### save
@@ -346,16 +348,22 @@ $newBookObj = new Book([
 ]);
 
 $newBookObj->save();
+
+// INSERT INTO books (isbn, title, author, price) VALUES ('12345', 'Book Title', 'Brandon Sanderson', 15)
 ```
 
 ### update
 
-You can also update using `update()` method:
+You can update records using `update()` method:
 
 ```php
-$bookObj->update(['title' => 'New Title']); // NOTE: this will set all book titles in table to 'New Title'. Make sure to add a where clause
+$bookObj->update(['title' => 'New Title']);
+// UPDATE books SET title = 'New Title'
+// NOTE: this will set all book titles in table to 'New Title'. Make sure to add a where clause
 
 $bookObj->where('id', 1)->update(['title' => 'New Title']);
+// UPDATE books SET title = 'New Title' WHERE id = 1
+
 ```
 
 Or update using `save()`
@@ -377,7 +385,7 @@ To delete a record, you would normally do:
 ```php
 $book = $bookObj->findOrFail(1);
 
-$book->delete();
+$book->delete(); // DELETE FROM books WHERE id = 1
 ```
 
 ### Soft Deletes
@@ -394,6 +402,12 @@ class Book extends BaseClass {
 
 And also add a column named `deleted_at` that will store the time of deletion.
 
+```php
+$book = $bookObj->findOrFail(1);
+
+$book->delete(); // UPDATE books SET deleted_at = NOW() WHERE id = 1
+```
+
 In case you were wondering, when using soft deletes, you don't have to add extra conditions to filter deleted records. However, you can retrieve records deleted too:
 
 ```php
@@ -405,9 +419,9 @@ $bookObj->withDeleted()->get(); // SELECT * FROM books
 If you want to restore a soft deleted record, just call the `restore()` method that will set the `deleted_at` to `NULL`:
 
 ```php
-$book = $bookObj->withDeleted()->find(1);
+$book = $bookObj->withDeleted()->find(1); // SELECT * FROM books WHERE id = 1
 
-$book->restore();
+$book->restore(); // UPDATE books SET deleted_at = NULL WHERE id = 1
 ```
 
 ## Debugging
