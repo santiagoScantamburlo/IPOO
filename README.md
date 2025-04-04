@@ -37,9 +37,12 @@
 ---
 
 [Command line](#command-line)
+
 - [Generating classes](#generating-classes)
 - [Generating classes linked to a table](#generating-classes-linked-to-a-table)
 - [Generating classes with soft deletes](#generating-classes-with-soft-deletes)
+
+---
 
 # BaseClass basic usage
 
@@ -488,6 +491,8 @@ $book->withTransaction()->restore();
 
 $bookObj->withTransaction()->where('id', 1)->update();
 ```
+
+---
 
 # Command line
 
