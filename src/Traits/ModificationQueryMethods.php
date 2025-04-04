@@ -19,11 +19,25 @@ trait ModificationQueryMethods
 
         $this->bindings[":id"] = $this->id;
 
+        if ($this->withTransaction) {
+            $this->pdo->beginTransaction();
+        }
+
         $statement = $this->pdo->prepare($this->query);
 
         $result = $statement->execute($this->bindings);
 
         $this->reset();
+
+        if ($result && $this->withTransaction) {
+            $this->pdo->commit();
+            return true;
+        }
+
+        if (!$result && $this->withTransaction) {
+            $this->pdo->rollBack();
+            return false;
+        }
 
         return $result;
     }
@@ -44,11 +58,25 @@ trait ModificationQueryMethods
 
         $this->query = "UPDATE {$this->table} SET " . implode(", ", $set);
 
+        if ($this->withTransaction) {
+            $this->pdo->beginTransaction();
+        }
+
         $statement = $this->pdo->prepare($this->query . $this->where);
 
         $result = $statement->execute($this->bindings);
 
         $this->reset();
+
+        if ($result && $this->withTransaction) {
+            $this->pdo->commit();
+            return true;
+        }
+
+        if (!$result && $this->withTransaction) {
+            $this->pdo->rollBack();
+            return false;
+        }
 
         return $result;
     }

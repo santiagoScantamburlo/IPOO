@@ -449,3 +449,26 @@ $bookObj->select(['id', 'isbn'])
     ->toSqlWithBindings();
 // SELECT id, isbn FROM books WHERE author <> 'Brandon Sanderson' ORDER BY id LIMIT 10
 ```
+
+## Transactions
+
+You can use transactions to avoid partial insertions, updates or deletes in case something fails and it is as easy as using `withTransaction()`:
+
+```php
+$bookObj->withTransaction()->insert([
+    'isbn' => '12345',
+    'title' => 'Book Title',
+    'author' => 'Brandon Sanderson',
+    'price' => 15
+]);
+
+$book = $bookObj->findOrFail(1);
+
+$book->withTransaction()->delete()
+
+$book = $bookObj->withDeleted()->findOrFail(1);
+
+$book->withTransaction()->restore();
+
+$bookObj->withTransaction()->where('id', 1)->update();
+```
