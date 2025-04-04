@@ -36,6 +36,11 @@
 
 ---
 
+[Command line](#command-line)
+- [Generating classes](#generating-classes)
+- [Generating classes linked to a table](#generating-classes-linked-to-a-table)
+- [Generating classes with soft deletes](#generating-classes-with-soft-deletes)
+
 # BaseClass basic usage
 
 ## Extending
@@ -482,4 +487,102 @@ $book = $bookObj->withDeleted()->findOrFail(1);
 $book->withTransaction()->restore();
 
 $bookObj->withTransaction()->where('id', 1)->update();
+```
+
+# Command line
+
+## Generating classes
+
+You can use the command line to generate a class with the following command:
+
+```bash
+php src/Scripts/newClass.php --name=Book
+```
+
+or
+
+```bash
+php src/Scripts/newClass.php -n Book
+```
+
+Output:
+
+```php
+<?php
+
+namespace Ipoo\Src\Classes;
+
+use Ipoo\Src\BaseClass;
+
+class Book extends BaseClass
+{
+	protected array $attributes = ['id'];
+}
+
+```
+
+## Generating classes linked to a table
+
+You can also specify if it should be linked to a table using `--table` or `-t`:
+
+```bash
+php src/Scripts/newClass.php -n Book --table=books
+```
+
+or
+
+```bash
+php src/Scripts/newClass.php -n Book --t books
+```
+
+Output:
+
+```php
+<?php
+
+namespace Ipoo\Src\Classes;
+
+use Ipoo\Src\BaseClass;
+
+class Book extends BaseClass
+{
+	protected string $table = 'books';
+
+	protected array $attributes = ['id'];
+}
+```
+
+## Generating classes with soft deletes
+
+You can specify if it has to use soft deletes using `--soft` or `-s`. This will add the `SoftDeletes` trait to the class and will also add the `deleted_at` column to the `$attributes` array. If you want to use soft deletes, you must also add the table name:
+
+```bash
+php src/Scripts/newClass.php --name=Book --table=books --soft
+```
+
+or
+
+```bash
+php src/Scripts/newClass.php -n Book -t books -s
+```
+
+Output:
+
+```php
+<?php
+
+namespace Ipoo\Src\Classes;
+
+use Ipoo\Src\BaseClass;
+
+use Ipoo\Src\Traits\SoftDeletes;
+
+class Book extends BaseClass
+{
+	use SoftDeletes;
+
+	protected string $table = 'books';
+
+	protected array $attributes = ['id', 'deleted_at'];
+}
 ```
