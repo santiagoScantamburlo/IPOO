@@ -55,9 +55,14 @@ trait ConditionQueryMethods
         $param = ":$column";
 
         // Check that the operator is included in the operators list
-        if (in_array($operator, BaseClass::OPERATORS)) {
+        if (in_array(strtoupper($operator), BaseClass::OPERATORS)) {
             // Concat the operator
             $this->where .= " $operator ";
+
+            if (is_array($searchValue)) {
+                $searchValue = "(" . implode(", ", $searchValue) . ")";
+            }
+
             $this->bindings[$param] = $searchValue;
         } else {
             // Default the operator to "="

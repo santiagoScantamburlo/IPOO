@@ -124,7 +124,7 @@ class BaseClass
      * - Static method: create(array $data)
      */
 
-    public const OPERATORS = ['=', '<>', 'like'];
+    public const OPERATORS = ['=', '<>', 'LIKE', 'IN'];
 
     /**
      * Constructor method that will be used to set the values of the attributes. It will be called when the class is instantiated.
