@@ -2,7 +2,6 @@
 
 namespace Ipoo\Src\Traits;
 
-use DateTime;
 use Ipoo\Src\BaseClass;
 
 trait ConditionQueryMethods

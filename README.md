@@ -32,6 +32,7 @@
 - [Delete](#delete)
   - [Soft deletes](#soft-deletes)
 - [Debugging](#debugging)
+- [Transactions](#transactions)
 
 ---
 
