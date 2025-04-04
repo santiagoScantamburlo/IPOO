@@ -249,11 +249,24 @@ $books = $bookObj->where('isbn', '1234'); // SELECT FROM books WHERE isbn = '123
 
 #### Special cases
 
+When using in operator the third parameter must be an array with multiple values or a string with comma separated values. Ex: `"(10,20,30)"` <=> `[10, 20, 30]`
+
 ```php
-$books = $bookObj->where('price', 'in', [10, 20, 30]); //When using in operator the third parameter must be an array with multiple values or a string with comma separated values. Ex: "(10,20,30)" <=> [10, 20, 30]
+$books = $bookObj->where('price', 'in', [10, 20, 30]);
+// or
+$books = $bookObj->where('price', 'in', '(10,20,30)');
+
 // SELECT * FROM books WHERE price IN (10, 20, 30)
 
-$books = $bookObj->where('price', 'between', [10, 20]); //When using between operator the third parameter must be an array with two values or a string with two values separated by AND. Ex: "10 AND 20" <=> [10, 20]
+```
+
+When using between operator the third parameter must be an array with two values or a string with two values separated by AND. Ex: `"10 AND 20"` <=> `[10, 20]`
+
+```php
+$books = $bookObj->where('price', 'between', [10, 20]);
+// or
+$books = $bookObj->where('price', 'between', '10 AND 20');
+
 // SELECT * FROM books WHERE price BETWEEN 10 AND 20
 ```
 
