@@ -19,6 +19,7 @@
   - [get](#get)
   - [select](#select)
   - [where](#where)
+  - [orWhere](#orwhere)
   - [find](#find--findorfail)
   - [orderBy](#orderby)
   - [groupBy](#groupby)
@@ -242,6 +243,15 @@ You can also chain multiple where clauses:
 ```php
 $books = $bookObj->where('isbn', '1234')->where('title', 'like', '%title%');
 // SELECT * FROM books WHERE isbn = '1234' AND title LIKE '%title%'
+```
+
+### orWhere
+
+You can also add `orWhere()` to your query:
+
+```php
+$books = $bookObj->where('isbn', '1234')->orWhere('title', 'like', '%title%');
+// SELECT * FROM books WHERE isbn = '1234' OR title LIKE '%title%'
 ```
 
 ### find / findOrFail

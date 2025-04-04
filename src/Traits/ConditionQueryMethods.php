@@ -38,6 +38,38 @@ trait ConditionQueryMethods
     }
 
     /**
+     * Similar to where() but adds the OR WHERE condition
+     * 
+     * @param string $column
+     * @param mixed $operator
+     * @param mixed $searchValue
+     * 
+     * @return self
+     */
+    public function orWhere(string $column, mixed $operator, mixed $searchValue = null): self
+    {
+        $this->where .= $this->where === '' ? " WHERE " : " OR ";
+
+        $this->where .= $column;
+
+        $param = ":$column";
+
+        // Check that the operator is included in the operators list
+        if (in_array($operator, BaseClass::OPERATORS)) {
+            // Concat the operator
+            $this->where .= " $operator ";
+            $this->bindings[$param] = $searchValue;
+        } else {
+            // Default the operator to "="
+            $this->where .= " = ";
+            $this->bindings[$param] = $operator;
+        }
+        $this->where .= $param;
+
+        return $this;
+    }
+
+    /**
      * Creates the statement of the limit of the results expected from the query
      * 
      * @param int $limit
