@@ -487,4 +487,12 @@ class BaseClass
 
         return $query;
     }
+
+    public function tableExists(): bool
+    {
+        $query = "SHOW TABLES LIKE :tableName";
+        $statement = $this->pdo->prepare($query);
+        $statement->execute([':tableName' => $this->table]);
+        return $statement->rowCount() > 0;
+    }
 }

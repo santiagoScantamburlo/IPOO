@@ -39,6 +39,21 @@ class Column
     }
 
     /**
+     * Sets the column type to INT
+     * 
+     * @param int $size
+     * 
+     * @return $this
+     */
+    public function int(int $size = 11)
+    {
+        $this->query = "{$this->name} INT({$size}) NOT NULL";
+
+        return $this;
+    }
+
+
+    /**
      * Removes the "NOT NULL" condition
      * 
      * @return $this

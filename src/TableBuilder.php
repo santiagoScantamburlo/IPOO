@@ -57,6 +57,18 @@ class TableBuilder
         }
     }
 
+    public static function drop(string $tableName)
+    {
+        self::initPDO();
+
+        try {
+            $statement = self::$pdo->prepare("DROP TABLE IF EXISTS {$tableName}");
+            $statement->execute();
+        } catch (PDOException $e) {
+            echo "Error dropping the table: " . $e->getMessage();
+        }
+    }
+
     /**
      * Initializes the PDO instance
      */

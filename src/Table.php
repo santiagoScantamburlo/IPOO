@@ -54,6 +54,17 @@ class Table
         return $column;
     }
 
+    public function int(string $columnName, int $size = 11): Column
+    {
+        $column = new Column($columnName);
+
+        $column->int($size);
+
+        $this->columns[] = $column;
+
+        return $column;
+    }
+
     /**
      * Creates a column of type BOOL
      * 

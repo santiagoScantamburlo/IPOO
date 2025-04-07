@@ -1,5 +1,7 @@
 <?php
 
+namespace Ipoo\Src\Scripts;
+
 $options = getopt('n:t:s', ['name:', 'table:', 'soft']);
 
 $className = $options['n'] ?? $options['name'] ?? null;
@@ -15,7 +17,11 @@ $tableName = $options['t'] ?? $options['table'] ?? null;
 
 $hasSoftDeletes = isset($options['s']) || isset($options['soft-deletes']);
 
-$content = "<?php\n\nnamespace Ipoo\Src\Classes;\n\nuse Ipoo\Src\BaseClass;\n\n";
+$content = "<?php
+
+namespace Ipoo\Src\Classes;
+
+use Ipoo\Src\BaseClass;\n\n";
 
 $tableDeclarationLine = "";
 
@@ -30,7 +36,9 @@ if ($connectToTable && $hasSoftDeletes) {
     $traitUseLine = "\tuse SoftDeletes;\n\n";
 }
 
-$content .= "class {$className} extends BaseClass\n{\n{$traitUseLine}{$tableDeclarationLine}";
+$content .= "class {$className} extends BaseClass
+{
+{$traitUseLine}{$tableDeclarationLine}";
 
 $content .= "\tprotected array \$attributes = ['id'";
 
