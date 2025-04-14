@@ -1,6 +1,6 @@
 <?php
 
-namespace Ipoo\Src;
+namespace Ipoo\Core\Database;
 
 class Table
 {
@@ -54,6 +54,13 @@ class Table
         return $column;
     }
 
+    /**
+     * Creates a column of type INT
+     * 
+     * @param string $columnName
+     * @param int $size
+     * @return Column
+     */
     public function int(string $columnName, int $size = 11): Column
     {
         $column = new Column($columnName);
@@ -99,6 +106,8 @@ class Table
 
     /**
      * Creates the `created_at` and `updated_at` columns
+     * 
+     * @return void
      */
     public function timestamps()
     {
@@ -114,6 +123,8 @@ class Table
 
     /**
      * Creates the `deleted_at` column
+     * 
+     * @return void
      */
     public function softDelete()
     {

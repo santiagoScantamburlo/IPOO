@@ -1,10 +1,8 @@
 <?php
 
-namespace Ipoo\Src;
+namespace Ipoo\Core;
 
-use Ipoo\Src\Traits\ConditionQueryMethods;
-use Ipoo\Src\Traits\ReadQueryMethods;
-use Ipoo\Src\Traits\WriteQueryMethods;
+use Ipoo\Core\Traits\{ConditionQueryMethods, ReadQueryMethods, WriteQueryMethods};
 use PDO;
 use PDOException;
 
@@ -81,6 +79,7 @@ class BaseClass
      * @var array|array<string, mixed> $bindings
      */
     protected array $bindings = [];
+    
     /**
      * All class fields with their values
      * 
@@ -452,6 +451,7 @@ class BaseClass
         $instance = new $class();
 
         foreach ($data as $key => $value) {
+            echo "$key => $value\n";
             $instance->$key = $value;
         }
 
@@ -488,6 +488,11 @@ class BaseClass
         return $query;
     }
 
+    /**
+     * Checks if the table exists in the database
+     * 
+     * @return bool
+     */
     public function tableExists(): bool
     {
         $query = "SHOW TABLES LIKE :tableName";

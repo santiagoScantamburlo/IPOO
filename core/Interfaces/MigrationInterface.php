@@ -1,6 +1,6 @@
 <?php
 
-namespace Ipoo\Src\Interfaces;
+namespace Ipoo\Core\Interfaces;
 
 interface MigrationInterface
 {

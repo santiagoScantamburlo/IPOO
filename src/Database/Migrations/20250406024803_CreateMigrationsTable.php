@@ -2,8 +2,8 @@
 
 namespace Ipoo\Src\Migrations;
 
-use Ipoo\Src\{TableBuilder, Table};
-use Ipoo\Src\Interfaces\MigrationInterface;
+use Ipoo\Core\Database\{Table, TableBuilder};
+use Ipoo\Core\Interfaces\MigrationInterface;
 
 class CreateMigrationsTable implements MigrationInterface
 {

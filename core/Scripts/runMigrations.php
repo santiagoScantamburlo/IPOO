@@ -1,8 +1,8 @@
 <?php
 
-namespace Ipoo\Src\Scripts;
+namespace Ipoo\Core\Scripts;
 
-use Ipoo\Src\Migration;
+use Ipoo\Core\Database\Migration;
 
 require_once __DIR__ . '/../../autoload.php';
 
@@ -79,7 +79,7 @@ function runMigrations(Migration $migrationObj)
         $fileName = explode("/", $file)[count(explode("/", $file)) - 1];
 
         $className = explode("_", basename($file, '.php'))[1];
-        $className = "Ipoo\Src\Migrations\\{$className}";
+        $className = "Ipoo\Src\Database\Migrations\\{$className}";
         if (class_exists($className)) {
             $migration = new $className();
             if (method_exists($migration, 'up')) {
@@ -114,7 +114,7 @@ function rollbackMigrations(Migration $migrationObj, int $batch = 1)
 
         $className = explode("_", basename($file, '.php'))[1];
 
-        $className = "Ipoo\Src\Migrations\\{$className}";
+        $className = "Ipoo\Src\Database\Migrations\\{$className}";
 
         if (class_exists($className)) {
             $migration = new $className();

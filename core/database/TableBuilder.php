@@ -1,12 +1,16 @@
 <?php
 
-namespace Ipoo\Src;
+namespace Ipoo\Core\Database;
 
 use PDO;
 use PDOException;
 
 class TableBuilder
 {
+    /**
+     * PDO instance for database connection
+     * @var PDO $pdo
+     */
     protected static PDO $pdo;
 
     public function __construct()
@@ -39,6 +43,8 @@ class TableBuilder
      * 
      * @param string $tableName
      * @param callable $callback
+     * @return void
+     * @throws PDOException
      */
     public static function create(string $tableName, callable $callback)
     {
@@ -49,7 +55,6 @@ class TableBuilder
         $callback($table);
 
         try {
-            // echo $table->getQuery();
             $statement = self::$pdo->prepare($table->getQuery());
             $statement->execute();
         } catch (PDOException $e) {
@@ -57,7 +62,33 @@ class TableBuilder
         }
     }
 
+    /**
+     * Drops the table.
+     * 
+     * @param string $tableName
+     * @return void
+     * @throws PDOException
+     */
     public static function drop(string $tableName)
+    {
+        self::initPDO();
+
+        try {
+            $statement = self::$pdo->prepare("DROP TABLE {$tableName}");
+            $statement->execute();
+        } catch (PDOException $e) {
+            echo "Error dropping the table: " . $e->getMessage();
+        }
+    }
+
+    /**
+     * Drops the table if it exists.
+     * 
+     * @param string $tableName
+     * @return void
+     * @throws PDOException
+     */
+    public function dropIfExists(string $tableName)
     {
         self::initPDO();
 
@@ -71,6 +102,9 @@ class TableBuilder
 
     /**
      * Initializes the PDO instance
+     * 
+     * @return void
+     * @throws PDOException
      */
     protected static function initPDO()
     {

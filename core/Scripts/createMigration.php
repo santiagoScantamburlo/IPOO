@@ -13,10 +13,10 @@ function getMigrationContent($className, $tableName)
 {
     return "<?php
 
-namespace Ipoo\Src\Migrations;
+namespace Ipoo\Src\Database\Migrations;
 
-use Ipoo\Src\{TableBuilder, Table};
-use Ipoo\Src\Interfaces\MigrationInterface;
+use Ipoo\Core\Database\{Table, TableBuilder};
+use Ipoo\Core\Interfaces\MigrationInterface;
 
 class {$className} implements MigrationInterface
 {
@@ -29,7 +29,7 @@ class {$className} implements MigrationInterface
 
 \tfunction down(): void
 \t{
-\t\tTableBuilder::drop('$tableName');
+\t\tTableBuilder::dropIfExists('$tableName');
 \t}
 }\n";
 }

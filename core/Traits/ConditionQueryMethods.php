@@ -1,8 +1,8 @@
 <?php
 
-namespace Ipoo\Src\Traits;
+namespace Ipoo\Core\Traits;
 
-use Ipoo\Src\BaseClass;
+use Ipoo\Core\BaseClass;
 
 trait ConditionQueryMethods
 {
@@ -126,5 +126,19 @@ trait ConditionQueryMethods
     {
         $this->groupBy = " GROUP BY {$column}";
         return $this;
+    }
+
+    /**
+     * Checks if the query has results
+     * 
+     * ? this method could be rearranged to use the EXISTS condition in the SQL query?
+     * 
+     * @return bool
+     */
+    public function exists(): bool
+    {
+        $this->limit(1);
+        $result = $this->get();
+        return !empty($result);
     }
 }

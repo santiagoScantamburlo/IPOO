@@ -1,6 +1,6 @@
 <?php
 
-namespace Ipoo\Src;
+namespace Ipoo\Core\Database;
 
 class Column
 {
@@ -51,7 +51,6 @@ class Column
 
         return $this;
     }
-
 
     /**
      * Removes the "NOT NULL" condition

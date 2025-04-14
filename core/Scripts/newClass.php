@@ -1,6 +1,6 @@
 <?php
 
-namespace Ipoo\Src\Scripts;
+namespace Ipoo\Core\Scripts;
 
 $options = getopt('n:t:s', ['name:', 'table:', 'soft']);
 
@@ -21,7 +21,7 @@ $content = "<?php
 
 namespace Ipoo\Src\Classes;
 
-use Ipoo\Src\BaseClass;\n\n";
+use Ipoo\Core\BaseClass;\n\n";
 
 $tableDeclarationLine = "";
 
@@ -32,7 +32,7 @@ if ($connectToTable) {
 }
 
 if ($connectToTable && $hasSoftDeletes) {
-    $content .= "use Ipoo\Src\Traits\SoftDeletes;\n\n";
+    $content .= "use Ipoo\Core\Traits\SoftDeletes;\n\n";
     $traitUseLine = "\tuse SoftDeletes;\n\n";
 }
 

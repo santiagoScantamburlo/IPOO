@@ -1,8 +1,8 @@
 <?php
 
-namespace Ipoo\Src;
+namespace Ipoo\Core\Database;
 
-use Ipoo\Src\BaseClass;
+use Ipoo\Core\BaseClass;
 
 class Migration extends BaseClass
 {

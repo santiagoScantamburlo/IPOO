@@ -1,6 +1,6 @@
 <?php
 
-namespace Ipoo\Src\Traits;
+namespace Ipoo\Core\Traits;
 
 use Exception;
 
